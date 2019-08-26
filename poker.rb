@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # play poker
 class Game
   # tableau avec les valeurs des cartes
@@ -16,7 +18,7 @@ class Game
     'Full House',
     'Four of a Kind',
     'Royal Flush'
-  ]
+  ].freeze
 
   def high_card(first_player_hand, second_player_hand)
     p1 = card_values(first_player_hand)
@@ -25,36 +27,158 @@ class Game
       return 1 if p1.include?(value) && !p2.include?(value)
       return 2 if p2.include?(value) && !p1.include?(value)
     end
-    return 0
+
+    0
+  end
+
+  def one_pair(first_player_hand, second_player_hand)
+    p1 = card_occurences(first_player_hand)
+    p2 = card_occurences(second_player_hand)
+    if p1.max_by{ |_k, v| v }[1] == 2 && p2.max_by{ |_k, v| v }[1] == 2
+      return 1 if p1.max_by{ |_k, v| v }[0].to_i > p2.max_by{ |_k, v| v }[0].to_i
+
+      return 2
+    elsif p1.max_by{ |_k, v| v }[1] == 2
+      return 1
+    elsif p2.max_by{ |_k, v| v }[1] == 2
+      return 2
+    end
+
+    0
+  end
+
+  def two_pairs(first_player_hand, second_player_hand)
+    # not enought time
+  end
+
+  def three_of_a_kind(first_player_hand, second_player_hand)
+    p1 = card_occurences(first_player_hand)
+    p2 = card_occurences(second_player_hand)
+    if p1.max_by{ |_k, v| v }[1] == 3 && p2.max_by{ |_k, v| v }[1] == 3
+      return 1 if p1.max_by{ |_k, v| v }[0].to_i > p2.max_by{ |_k, v| v }[0].to_i
+
+      return 2
+    elsif p1.max_by{ |_k, v| v }[1] == 3
+      return 1
+    elsif p2.max_by{ |_k, v| v }[1] == 3
+      return 2
+    end
+
+    0
+  end
+
+  def straight(first_player_hand, second_player_hand)
+    if straight?(first_player_hand, higher_card(first_player_hand)) &&
+       straight?(second_player_hand, higher_card(second_player_hand))
+      return 0
+    elsif straight?(first_player_hand, higher_card(first_player_hand))
+      return 1
+    elsif straight?(second_player_hand, higher_card(second_player_hand))
+      return 2
+    end
+
+    0
+  end
+
+  def flush(first_player_hand, second_player_hand)
+    if all_suits?(first_player_hand) && all_suits?(second_player_hand)
+      return 0
+    elsif all_suits?(first_player_hand)
+      return 1
+    elsif all_suits?(second_player_hand)
+      return 2
+    end
+
+    0
+  end
+
+  def full_house(first_player_hand, second_player_hand)
+    # not enought time
+  end
+
+  def four_of_a_kind(first_player_hand, second_player_hand)
+    p1 = card_occurences(first_player_hand)
+    p2 = card_occurences(second_player_hand)
+    if p1.max_by{ |_k, v| v }[1] == 4 && p2.max_by{ |_k, v| v }[1] == 4
+      return 1 if p1.max_by{ |_k, v| v }[0].to_i > p2.max_by{ |_k, v| v }[0].to_i
+
+      return 2
+    elsif p1.max_by{ |_k, v| v }[1] == 4
+      return 1
+    elsif p2.max_by{ |_k, v| v }[1] == 4
+      return 2
+    end
+
+    0
+  end
+
+  def straight_flush(first_player_hand, second_player_hand)
+    if (all_suits?(first_player_hand) &&
+       straight?(first_player_hand, higher_card(first_player_hand))) &&
+       (all_suits?(second_player_hand) &&
+       straight?(second_player_hand, higher_card(second_player_hand)))
+      return 0
+    elsif all_suits?(first_player_hand) && 
+          straight?(first_player_hand, higher_card(first_player_hand))
+      return 1
+    elsif all_suits?(second_player_hand) && 
+          straight?(second_player_hand, higher_card(second_player_hand))
+      return 2
+    end
+
+    0
   end
 
   def royal_flush(first_player_hand, second_player_hand)
-    if (all_suits?(first_player_hand) && straight?(first_player_hand, '9')) &&
-      (all_suits?(second_player_hand) && straight?(second_player_hand, '9'))
+    if (all_suits?(first_player_hand) && straight?(first_player_hand, 'A')) &&
+       (all_suits?(second_player_hand) && straight?(second_player_hand, 'A'))
       return 0
-    elsif (all_suits?(first_player_hand) && straight?(first_player_hand, '9'))
+    elsif all_suits?(first_player_hand) && straight?(first_player_hand, 'A')
       return 1
-    elsif all_suits?(second_player_hand) && straight?(second_player_hand, '9')
+    elsif all_suits?(second_player_hand) && straight?(second_player_hand, 'A')
       return 2
     end
-    return 0
+
+    0
   end
 
-  private 
+  private
 
-  def straight?(hand, limit)
+  def card_occurences(hand)
+    hand_values = card_values(hand)
+    counts = Hash.new(0)
+    hand_values.each { |value| counts[value] += 1 }
+    counts
+  end
+
+  def higher_card(hand)
     hand_values = card_values(hand)
     VALUES.each do |value|
-      break if value == limit
-      return false if !hand_values.include?(value)
+      return value if hand_values.include?(value)
     end
-    return true
+  end
+
+  def straight?(hand, limit)
+    return false if %w[5 4 3 2].include?(limit)
+
+    hand_values = card_values(hand)
+    higher_card_index = VALUES.find_index(limit)
+
+    VALUES.each_with_index do |value, index|
+      break if index == (higher_card_index + 5)
+
+      if index >= higher_card_index
+        return false unless hand_values.include?(value)
+      end
+    end
+
+    true
   end
 
   def all_suits?(hand)
     hand_suits = card_suits(hand)
     hand_suits.each { |suit| return false if hand_suits[0] != suit }
-    return true
+    true
   end
 
   def card_suits(hand)
@@ -68,7 +192,7 @@ class Game
   end
 
   def card_values(hand)
-    hand.map do|card|
+    hand.map do |card|
       if card.include?('10')
         card[0] + card[1]
       else
@@ -76,34 +200,4 @@ class Game
       end
     end
   end
-  # comparer les 2 mains en utilisant leurs valeurs/combinaisons
-  def game(hand)
-    hands =  hand.split(' ')
-    first_player_hand = hands.slice(0..4)
-    second_player_hand = hands.slice(5..9)
-
-    # player_one_score = 0
-    # player_two_score = 0
-
-    # if first_player_hand > second_player_hand
-    #   'First player wins!'
-    #   player_one_score += 1
-    # elsif first_player_hand < second_player_hand
-    #   'Second player wins!'
-    #   player_two_score += 1
-    # else 
-    #   'Tie' # => calculate highest value
-    # end
-    
-    # if player_one_score == player_two_score
-    #   'Tie'
-    # elsif player_one_score > player_two_score
-    #   "Player 1 won #{player_one_score}"
-    # else 
-    #   "Player 2 won #{player_two_score}"
-    # end
-
-  end
-
-
 end

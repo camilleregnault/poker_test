@@ -44,12 +44,102 @@ describe '#game' do
       )).to eq(0)
   end
 
-  # it 'returnq the winner' do
-  #   expect(game('5H 5C 6S 7S KD 2C 3S 8S 8D TD')).to eq('Player 2 wins!')
-  #   expect(game('5D 8C 9S JS AC 2C 5C 7D 8S QH')).to eq('Player 1 wins!')
-  #   expect(game('2D 9C AS AH AC 3D 6D 7D TD QD')).to eq('Player 2 wins!')
-  #   expect(game('4D 6S 9H QH QC 3D 6D 7H QD QS')).to eq('Player 1 wins!')
-  #   expect(game('2H 2D 4C 4D 4S 3C 3D 3S 9S 9D')).to eq('Player 1 wins!')
-  # end
+  it 'returns a winner for the Straight Flush' do
+    expect(@game.straight_flush(
+      %w[2D 3D 4D 5D 6D],
+      %w[2C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.straight_flush(
+      %w[2D 4C 7S JS AC],
+      %w[9D 10D JD KD QD]
+      )).to eq(2)
+    expect(@game.straight_flush(
+      %w[9D JC QS KS AC],
+      %w[9D JS QD KD AD]
+      )).to eq(0)
+    expect(@game.straight_flush(
+      %w[9D 10D JD QD KD],
+      %w[9S 10S JS QS KS]
+      )).to eq(0)
+  end
+
+  it 'returns a winner for the Flush' do
+    expect(@game.flush(
+      %w[2D 3D 6D 5D 6D],
+      %w[2C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.flush(
+      %w[2D 4C 7S JS AC],
+      %w[9D 10D JD 6D QD]
+      )).to eq(2)
+    expect(@game.flush(
+      %w[9D JC QS KS AC],
+      %w[9D JS QD KD AD]
+      )).to eq(0)
+    expect(@game.flush(
+      %w[9D 10D JD QD KD],
+      %w[9S 10S JS QS KS]
+      )).to eq(0)
+  end
+
+  it 'returns a winner for the Straight' do
+    expect(@game.straight(
+      %w[2D 3D 4D 5S 6D],
+      %w[2C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.straight(
+      %w[2D 4C 7S JS AC],
+      %w[9D 10D JS QD KD]
+      )).to eq(2)
+    expect(@game.straight(
+      %w[9C JC QS KS AC],
+      %w[9D JS QD KD AD]
+      )).to eq(0)
+    expect(@game.straight(
+      %w[9D 10D 3D QD KD],
+      %w[9S 10S 2S QS KS]
+      )).to eq(0)
+  end
+
+  it 'returns a winner for the Four of a Kind' do
+    expect(@game.four_of_a_kind(
+      %w[2D 2S 2C 2H 6D],
+      %w[3C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.four_of_a_kind(
+      %w[3D 4C 7S JS AC],
+      %w[2D 2S 2C 2H 6D]
+      )).to eq(2)
+    expect(@game.four_of_a_kind(
+      %w[2D 2S 2C 2H 6D],
+      %w[3H 3S 3C 3D AD]
+      )).to eq(2)
+  end
+
+  it 'returns a winner for the Three of a Kind' do
+    expect(@game.three_of_a_kind(
+      %w[2D 2S 2C 3H 4D],
+      %w[3C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.three_of_a_kind(
+      %w[3D 4C 7S JS AC],
+      %w[2D 2S 2C 5H 3D]
+      )).to eq(2)
+    expect(@game.three_of_a_kind(
+      %w[2D 2S 2C 3H 8D],
+      %w[4H 4S 4C 5D 6D]
+      )).to eq(2)
+  end
+
+  it 'returns a winner for the one pair' do
+    expect(@game.one_pair(
+      %w[2D 2S 3C 5H 4D],
+      %w[3C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.one_pair(
+      %w[3D 4C 7S JS AC],
+      %w[2D 2S 3C 5H 6D]
+      )).to eq(2)
+  end
 
 end
