@@ -13,12 +13,35 @@ describe '#game' do
   it 'returns a winner for the highest card' do
     expect(@game.high_card(
       %w[2D 4C 7S JS AC],
-      %w[2C 5C 7D 8S QH]
+      %w[2C 5C 7D 10S QH]
       )).to eq(1)
     expect(@game.high_card(
       %w[2D 4C 7S JS AC],
       %w[2C 5C 7D QS AH]
       )).to eq(2)
+    expect(@game.high_card(
+      %w[2D 5C 7S JS AC],
+      %w[2C 5C 7D JS AH]
+      )).to eq(0)
+  end
+
+  it 'returns a winner for the Royal Flush' do
+    expect(@game.royal_flush(
+      %w[10D JD QD KD AD],
+      %w[2C 5C 7D 8S QH]
+      )).to eq(1)
+    expect(@game.royal_flush(
+      %w[2D 4C 7S JS AC],
+      %w[10D JD QD KD AD]
+      )).to eq(2)
+    expect(@game.royal_flush(
+      %w[10D JC QS KS AC],
+      %w[10D JS QD KD AD]
+      )).to eq(0)
+    expect(@game.royal_flush(
+      %w[10D JD QD KD AD],
+      %w[10S JS QS KS AS]
+      )).to eq(0)
   end
 
   # it 'returnq the winner' do

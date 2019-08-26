@@ -28,10 +28,53 @@ class Game
     return 0
   end
 
+  def royal_flush(first_player_hand, second_player_hand)
+    if (all_suits?(first_player_hand) && straight?(first_player_hand, '9')) &&
+      (all_suits?(second_player_hand) && straight?(second_player_hand, '9'))
+      return 0
+    elsif (all_suits?(first_player_hand) && straight?(first_player_hand, '9'))
+      return 1
+    elsif all_suits?(second_player_hand) && straight?(second_player_hand, '9')
+      return 2
+    end
+    return 0
+  end
+
   private 
 
+  def straight?(hand, limit)
+    hand_values = card_values(hand)
+    VALUES.each do |value|
+      break if value == limit
+      return false if !hand_values.include?(value)
+    end
+    return true
+  end
+
+  def all_suits?(hand)
+    hand_suits = card_suits(hand)
+    hand_suits.each { |suit| return false if hand_suits[0] != suit }
+    return true
+  end
+
+  def card_suits(hand)
+    hand.map do |card| 
+      if card.include?('10')
+        card[2]
+      else
+        card[1]
+      end
+    end
+  end
+
   def card_values(hand)
-   hand.map { |card| card[0]  }
+    hand.map do|card|
+      if card.include?('10')
+        card[0] + card[1]
+      else
+        card[0]
+      end
+    end
   end
   # comparer les 2 mains en utilisant leurs valeurs/combinaisons
   def game(hand)
